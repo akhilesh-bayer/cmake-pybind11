@@ -43,9 +43,11 @@ This project should run on GNU/Linux, MacOS and Windows.
 You'll need:
 
 * "CMake >= 3.18".
-* "Python >= 3.6" and python module 'pip' (ed "setuptools" and "wheel" will be
- auto installed on demand).
+* "Python >= 3.6" and python module 'pip' (setuptools and wheel will be auto installed on demand).
 * "Pybind11 >= 2.10".
+
+For modern PEP 621 compliant builds (optional but recommended):
+* `python -m pip install build` for using `python -m build`
 
 ## Codemap
 
@@ -118,13 +120,23 @@ The pipeline for `linux-x86-64` should be as follow:<br>
 Thus we have the C++ shared library `libFoo.so` and the pybind11
 Python shared library e.g. `pyFoo.so` in the same package.
 
-Here some dev-note concerning this `setup.py`.
-* This package is a native package containing native libraries.
+This project now supports **PEP 621** compliant packaging with modern Python build tools:
+* Package metadata is defined in `pyproject.toml` following PEP 621 standards
+* Compatible with modern build tools like `python -m build`
+* Maintains backward compatibility with legacy `setup.py` approach
 
-Then you can generate the package and install it locally using:
+You can generate the package and install it locally using modern tools:
 ```bash
-python3 setup.py bdist_wheel
-python3 -m pip install --user --find-links=dist cmakepybind11
+# Modern approach (recommended)
+python -m build --wheel
+python -m pip install --user --find-links=dist cmakepybind11
+
+# Or using the legacy approach
+python setup.py bdist_wheel
+python -m pip install --user --find-links=dist cmakepybind11
+
+# Or use the provided build script
+python build_wheel.py
 ```
 
 If everything good the package (located in `<buildir>/python/dist`) should have

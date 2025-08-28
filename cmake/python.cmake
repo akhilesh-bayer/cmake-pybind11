@@ -107,15 +107,10 @@ file(GENERATE OUTPUT ${PYTHON_PROJECT_DIR}/foo/__init__.py CONTENT "")
 file(GENERATE OUTPUT ${PYTHON_PROJECT_DIR}/bar/__init__.py CONTENT "")
 file(GENERATE OUTPUT ${PYTHON_PROJECT_DIR}/foobar/__init__.py CONTENT "")
 
-# setup.py.in contains cmake variable e.g. @PYTHON_PROJECT@ and
-# generator expression e.g. $<TARGET_FILE_NAME:pyFoo>
-configure_file(
-  ${PROJECT_SOURCE_DIR}/python/setup.py.in
-  ${PROJECT_BINARY_DIR}/python/setup.py.in
-  @ONLY)
-file(GENERATE
-  OUTPUT ${PROJECT_BINARY_DIR}/python/setup.py
-  INPUT ${PROJECT_BINARY_DIR}/python/setup.py.in)
+# Copy modern setup.py, pyproject.toml, and MANIFEST.in files for PEP 621 compliance
+file(COPY ${PROJECT_SOURCE_DIR}/setup.py DESTINATION ${PROJECT_BINARY_DIR}/python/)
+file(COPY ${PROJECT_SOURCE_DIR}/pyproject.toml DESTINATION ${PROJECT_BINARY_DIR}/python/)
+file(COPY ${PROJECT_SOURCE_DIR}/MANIFEST.in DESTINATION ${PROJECT_BINARY_DIR}/python/)
 
 #add_custom_command(
 #  OUTPUT python/setup.py
@@ -123,13 +118,14 @@ file(GENERATE
 #  COMMAND ${CMAKE_COMMAND} -E copy setup.py setup.py
 #  WORKING_DIRECTORY python)
 
-# Look for python module wheel
+# Look for python modules required for PEP 621 builds
 search_python_module(
   NAME setuptools
   PACKAGE setuptools)
 search_python_module(
   NAME wheel
   PACKAGE wheel)
+# Note: build module is optional, we have fallback to legacy setup.py approach
 
 add_custom_command(
   OUTPUT python/dist/timestamp
@@ -148,13 +144,21 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:pyFoo> ${PYTHON_PROJECT}/foo
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:pyBar> ${PYTHON_PROJECT}/bar
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:pyFooBar> ${PYTHON_PROJECT}/foobar
-  #COMMAND ${Python3_EXECUTABLE} setup.py bdist_egg bdist_wheel
-  COMMAND ${Python3_EXECUTABLE} setup.py bdist_wheel
+  # Try modern build approach first, fallback to legacy setup.py if needed
+  COMMAND ${Python3_EXECUTABLE} -c "
+try:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, '-m', 'build', '--wheel'])
+except (ImportError, subprocess.CalledProcessError):
+    subprocess.check_call([sys.executable, 'setup.py', 'bdist_wheel'])
+"
   COMMAND ${CMAKE_COMMAND} -E touch ${PROJECT_BINARY_DIR}/python/dist/timestamp
   MAIN_DEPENDENCY
-    python/setup.py.in
+    ${PROJECT_SOURCE_DIR}/setup.py
   DEPENDS
-    python/setup.py
+    ${PROJECT_SOURCE_DIR}/pyproject.toml
+    ${PROJECT_SOURCE_DIR}/MANIFEST.in
     ${PROJECT_NAMESPACE}::Foo
     ${PROJECT_NAMESPACE}::pyFoo
     ${PROJECT_NAMESPACE}::pyBar

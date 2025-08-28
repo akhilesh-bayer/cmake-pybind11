@@ -1,0 +1,9 @@
+# Include package data and binary files
+include pyproject.toml
+include README.md
+include LICENSE
+recursive-include cmakepybind11 *.so *.dll *.dylib
+recursive-include cmakepybind11/.libs *
+recursive-include cmakepybind11/foo *.so *.dll *.dylib
+recursive-include cmakepybind11/bar *.so *.dll *.dylib  
+recursive-include cmakepybind11/foobar *.so *.dll *.dylib

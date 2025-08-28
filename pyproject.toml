@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "cmake>=3.18", "pybind11>=2.10"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cmakepybind11"
+version = "1.0.0"
+description = "CMake + pybind11 example project for building native Python wheels"
+readme = "README.md"
+requires-python = ">=3.6"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Mizux", email = "mizux.dev@gmail.com"}
+]
+keywords = ["cmake", "pybind11", "python", "native", "extensions"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X", 
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+[project.urls]
+Homepage = "https://github.com/Mizux/cmake-pybind11"
+Repository = "https://github.com/Mizux/cmake-pybind11.git"
+Issues = "https://github.com/Mizux/cmake-pybind11/issues"
+
+[tool.setuptools]
+packages = ["cmakepybind11", "cmakepybind11.foo", "cmakepybind11.bar", "cmakepybind11.foobar"]
+
+[tool.setuptools.package-data]
+"cmakepybind11" = ["*.so", "*.dylib", "*.dll", ".libs/*"]
+"cmakepybind11.foo" = ["*.so", "*.dylib", "*.dll"]
+"cmakepybind11.bar" = ["*.so", "*.dylib", "*.dll"]
+"cmakepybind11.foobar" = ["*.so", "*.dylib", "*.dll"]
